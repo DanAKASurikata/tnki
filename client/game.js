@@ -136,6 +136,11 @@ const create_room = () => {
     });
 };
 
+const leave_room = () => {
+    socket.emit("leave_room");
+    set_screen("home");
+}
+
 const join_room = () => {
     const room_name = document.getElementById("room_name").value;
     const player_name = document.getElementById("player_name").value;
@@ -258,7 +263,7 @@ document.onkeydown = (e) => {
     }
 
     //? Líbí se ti střelba při klávese "space"? Pokud ne, můžeš ji libovolně měnit!
-    if (e.code == "Space") {
+    if (e.code == "MouseLeft") {
         e.preventDefault();
         socket.emit("update_shoot");
     }

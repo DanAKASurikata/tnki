@@ -64,6 +64,9 @@ class Room {
     }
 
     //TODO: Vytvoř metodu pro smazání hráče ze serveru
+    delete(session_id, tank) {
+        this.tanks.delete(session_id);
+    }
 
     tanks_length() {
         return this.tanks.size;
@@ -139,7 +142,9 @@ class Tank {
 
 const io = new Server(3000, { cors: { origin: '*' } });
 
-//TODO: Vytvoř interval, který bude pravidelně doplňovat náboje
+setInterval(() => {
+    console.info("náboje doplněny - test")
+}, 5000)
 
 io.on("connection", (socket) => {
     socket.on("create_room", (msg) => {
@@ -194,6 +199,7 @@ io.on("connection", (socket) => {
 
     //TODO: Přidej event handler pro doborovolné odpojení hráče z čekajcí místnosti (lobby)
     socket.on("leave_room", () => {
+        Room.delete(socket.id);
     });
 
     socket.on("start_room", () => {
@@ -209,7 +215,7 @@ io.on("connection", (socket) => {
         const room = rooms.get(map_id_room.get(socket.id));
 
         if (!room) {
-            //Místnost není aktivní!
+            socket.emit("error", { message: "Room isn't active!" });
             return;
         };
 
@@ -243,7 +249,7 @@ io.on("connection", (socket) => {
         const room = rooms.get(map_id_room.get(socket.id));
 
         if (!room) {
-            //Místnost není aktivní!
+            socket.emit("error", { message: "Room isn't active!" });
             return;
         }
 
