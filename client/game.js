@@ -118,9 +118,10 @@ class Game {
     }
 }
 
+let room_name = '';
 
 const create_room = () => {
-    const room_name = document.getElementById("room_name").value;
+    room_name = document.getElementById("room_name").value;
     const max_players = document.getElementById("max_players").value;
     const player_name = document.getElementById("player_name").value;
 
@@ -137,8 +138,14 @@ const create_room = () => {
 };
 
 const leave_room = () => {
-    socket.emit("leave_room");
+    socket.emit("leave_room", {
+        room_name: room_name,
+    });
     set_screen("home");
+}
+
+function log_room() {
+    socket.emit("log_room");
 }
 
 const join_room = () => {
@@ -253,7 +260,7 @@ socket.on("shoot_updated", (msg) => {
 ? Chceš se radši pohybovat pomocí wsad? Stačí upravit následující pole!
 ! Musíš používat stejnou sadu kláves u klienta i na serveru!
 */
-const move_keys = ["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"];
+const move_keys = ["KeyW", "KeyA", "KeyS", "KeyD"];
 
 document.onkeydown = (e) => {
     if (move_keys.includes(e.code)) {
@@ -263,7 +270,7 @@ document.onkeydown = (e) => {
     }
 
     //? Líbí se ti střelba při klávese "space"? Pokud ne, můžeš ji libovolně měnit!
-    if (e.code == "MouseLeft") {
+    if (e.code == "Space") {
         e.preventDefault();
         socket.emit("update_shoot");
     }

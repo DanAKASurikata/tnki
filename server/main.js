@@ -35,10 +35,10 @@ const start_positions = [
 
 //? Změnil jsi ovládání pohybu? Ujisti se, že jsou u klineta nastaveny stejné klávesy jako zde!
 const map_key_value = new Map([
-    ["ArrowUp", { x: 0, y: -1 }],
-    ["ArrowLeft", { x: -1, y: 0 }],
-    ["ArrowDown", { x: 0, y: 1 }],
-    ["ArrowRight", { x: 1, y: 0 }],
+    ["KeyW", { x: 0, y: -1 }],
+    ["KeyA", { x: -1, y: 0 }],
+    ["KeyS", { x: 0, y: 1 }],
+    ["KeyD", { x: 1, y: 0 }],
 ]);
 
 const rooms = new Map();
@@ -90,8 +90,20 @@ class Tank {
 
     //! Místo této funkce
     //TODO: Vytvoř metodu, která ověří správnost souřadnic
-    validate_move() {
-        return true;
+    validate_move(souradnice) {
+        if(map[souradnice[1]] == null){
+            return false;
+        }
+        if(map[souradnice[1]][souradnice[0]] == null){
+            return false;
+        }
+        console.log(souradnice);
+        console.log(map[souradnice[1]][souradnice[0]]);
+        if(map[souradnice[1]][souradnice[0]] == 0){
+            return true;
+        } else{
+            return false;
+        }
     }
 
     move(key, shift) {
@@ -166,6 +178,10 @@ io.on("connection", (socket) => {
         socket.emit("room_joined", { player_index: 0, room_name: msg.room_name, max_players: msg.max_players });
     });
 
+    socket.on("log_room", () => {
+        console.log(rooms);
+    })
+
     socket.on("join_room", (msg) => {
         const room = rooms.get(msg.room_name);
 
@@ -198,8 +214,8 @@ io.on("connection", (socket) => {
     })
 
     //TODO: Přidej event handler pro doborovolné odpojení hráče z čekajcí místnosti (lobby)
-    socket.on("leave_room", () => {
-        Room.delete(socket.id);
+    socket.on("leave_room", (msg) => {
+        console.log(msg.room_name);
     });
 
     socket.on("start_room", () => {
