@@ -144,8 +144,17 @@ const leave_room = () => {
     set_screen("home");
 }
 
-function log_room() {
-    socket.emit("log_room");
+function log_room(verze) {
+    console.log("log_room" + verze);
+    socket.emit("log_room" + verze, {
+        room_name: room_name,
+    });
+}
+
+function tnkDel(){
+    socket.emit("tnk_del", {
+        room_name: room_name,
+    })
 }
 
 const join_room = () => {

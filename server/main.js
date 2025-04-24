@@ -42,21 +42,21 @@ const map_key_value = new Map([
 ]);
 
 const rooms = new Map();
-const map_id_room = new Map();
+const map_id_room = new Map();   
 
-class Room {
-    started = false;
-    tanks = new Map();
+class Room {   
+    started = false;   
+    tanks = new Map();   
 
-    constructor(session_id, tank, max_players, room_name, game_map) {
-        this.admin = session_id;
-        this.max_players = max_players;
-        this.room_name = room_name;
-        this.game_map = game_map;
+    constructor(session_id, tank, max_players, room_name, game_map) {   
+        this.admin = session_id;   
+        this.max_players = max_players;   
+        this.room_name = room_name;   
+        this.game_map = game_map;   
 
-        this.tanks.set(session_id, tank);
-        map_id_room.set(session_id, room_name);
-    }
+        this.tanks.set(session_id, tank);   
+        map_id_room.set(session_id, room_name);   
+    }   
 
     join(session_id, tank) {
         this.tanks.set(session_id, tank);
@@ -64,8 +64,8 @@ class Room {
     }
 
     //TODO: Vytvoř metodu pro smazání hráče ze serveru
-    delete(session_id, tank) {
-        this.tanks.delete(session_id);
+    delete(room_name, idUz) {
+        rooms.get(msg.room_name).tanks = rooms.get(room_name).tanks.delete(idUz);
     }
 
     tanks_length() {
@@ -88,13 +88,13 @@ class Tank {
     }
 
 
-    //! Místo této funkce
-    //TODO: Vytvoř metodu, která ověří správnost souřadnic
     validate_move(souradnice) {
         if(map[souradnice[1]] == null){
+            console.log("Y není validní pozice!");
             return false;
         }
         if(map[souradnice[1]][souradnice[0]] == null){
+            console.log("X není validní pozice!");
             return false;
         }
         console.log(souradnice);
@@ -154,9 +154,9 @@ class Tank {
 
 const io = new Server(3000, { cors: { origin: '*' } });
 
-setInterval(() => {
-    console.info("náboje doplněny - test")
-}, 5000)
+//setInterval(() => {
+//    console.info("náboje doplněny - test")
+//}, 5000)
 
 io.on("connection", (socket) => {
     socket.on("create_room", (msg) => {
@@ -178,8 +178,27 @@ io.on("connection", (socket) => {
         socket.emit("room_joined", { player_index: 0, room_name: msg.room_name, max_players: msg.max_players });
     });
 
-    socket.on("log_room", () => {
+    socket.on("log_room0", (msg) => {
         console.log(rooms);
+    })
+
+    socket.on("log_room1", (msg) => {
+        console.log(rooms.get(msg.room_name));
+    })
+
+    socket.on("log_room2", (msg) => {
+        console.log(msg.room_name);
+        console.log(rooms.get(msg.room_name).tanks.delete(msg.session_id));
+    })
+
+    socket.on("tnk_del", (msg) => {
+        console.log(socket.id)
+        console.log(rooms.get(msg.room_name).tanks.get(socket.id));
+        console.log("");
+
+        rooms.get(msg.room_name).tanks = rooms.get(msg.room_name).tanks.delete(socket.id);
+
+        console.log(rooms.get(msg.room_name))
     })
 
     socket.on("join_room", (msg) => {
