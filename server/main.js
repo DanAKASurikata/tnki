@@ -63,7 +63,6 @@ class Room {
         map_id_room.set(session_id, this.room_name);
     }
 
-    //TODO: Vytvoř metodu pro smazání hráče ze serveru
     delete(room_name, idUz) {
         rooms.get(msg.room_name).tanks = rooms.get(room_name).tanks.delete(idUz);
     }
@@ -78,7 +77,9 @@ class Room {
 
 class Tank {
     constructor(index, player_name, session_id) {
-        //TODO: Přidej tanku potřebné atributy - směr, životy, náboje
+        this.dir = 0;
+        this.health = 3;
+        this.ammo = 3;
         this.x = start_positions[index].x;
         this.y = start_positions[index].y;
         this.color = colors[index];
@@ -97,8 +98,6 @@ class Tank {
             console.log("X není validní pozice!");
             return false;
         }
-        console.log(souradnice);
-        console.log(map[souradnice[1]][souradnice[0]]);
         if(map[souradnice[1]][souradnice[0]] == 0){
             return true;
         } else{
@@ -154,20 +153,12 @@ class Tank {
 
 const io = new Server(3000, { cors: { origin: '*' } });
 
-//setInterval(() => {
-//    console.info("náboje doplněny - test")
-//}, 5000)
-
 io.on("connection", (socket) => {
     socket.on("create_room", (msg) => {
         if (rooms.has(msg.room_name)) {
             socket.emit("error", { message: "Room with this name already exists" });
             return;
         }
-
-        //TODO: Přidej podmínku pro ověření, že název místnosti má maximálně 10 znaků
-
-        //TODO: Přidej podmínku pro ověření, že přezdívka hráče má maximálně 10 znaků
 
         const admin_tank = new Tank(0, msg.player_name, socket.id);
 
@@ -179,7 +170,9 @@ io.on("connection", (socket) => {
     });
 
     socket.on("log_room0", (msg) => {
+        console.log(rooms.get(msg.room_name).tanks.get(socket.id).ammo)
         console.log(rooms);
+        rooms.get(msg.room_name).tanks.get(socket.id).ammo = rooms.get(msg.room_name).tanks.get(socket.id).ammo+1
     })
 
     socket.on("log_room1", (msg) => {
@@ -192,13 +185,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on("tnk_del", (msg) => {
-        console.log(socket.id)
-        console.log(rooms.get(msg.room_name).tanks.get(socket.id));
-        console.log("");
-
         rooms.get(msg.room_name).tanks = rooms.get(msg.room_name).tanks.delete(socket.id);
-
-        console.log(rooms.get(msg.room_name))
     })
 
     socket.on("join_room", (msg) => {
@@ -219,8 +206,6 @@ io.on("connection", (socket) => {
             return;
         }
 
-        //TODO: Přidej podmínku pro ověření, že přezdívka hráče má maximálně 10 znaků
-
         const new_tank = new Tank(room.tanks_length(), msg.player_name, socket.id);
 
         room.join(socket.id, new_tank);
@@ -237,10 +222,18 @@ io.on("connection", (socket) => {
         console.log(msg.room_name);
     });
 
-    socket.on("start_room", () => {
+    socket.on("start_room", (msg) => {
         const room = rooms.get(map_id_room.get(socket.id));
 
-        //TODO: Přidej podmínku, aby mohl místnost spustit jen admin
+        console.log(msg.room_name);
+
+        if(msg.room_name == null || msg.room_name == ""){
+            return;
+        }
+
+        if(rooms.get(msg.room_name).admin != socket.id){
+            return;
+        }
 
         room.started = true;
         io.to(room.room_name).emit("room_started", { tanks: [...room.tanks.entries()], map: map, room_name: room.room_name });

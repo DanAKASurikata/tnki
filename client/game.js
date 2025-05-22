@@ -125,6 +125,25 @@ const create_room = () => {
     const max_players = document.getElementById("max_players").value;
     const player_name = document.getElementById("player_name").value;
 
+    if(room_name.length > 10 && player_name.length >10){
+        alert("Moc dlouhý název místnosti a moc dlouhé uživatlské jméno!\nLimit obou je 10 znaků!");
+        document.getElementById("room_name").value = null;
+        document.getElementById("player_name").value = null;
+        return;
+    }
+
+    if(room_name.length > 10){
+        alert("Moc dlouhý název místnosti! Limit je 10 znaků!");
+        document.getElementById("room_name").value = null;
+        return;
+    }
+
+    if(player_name.length > 10){
+        alert("Moc dlouhé uživatelské jméno! Limit je 10 znaků!");
+        document.getElementById("player_name").value = null;
+        return;
+    }
+
     if (!room_name || !max_players || !player_name) {
         alert("Vyplňte všechna pole!");
         return;
@@ -155,11 +174,17 @@ function tnkDel(){
     socket.emit("tnk_del", {
         room_name: room_name,
     })
+    set_screen("home");
 }
 
 const join_room = () => {
     const room_name = document.getElementById("room_name").value;
     const player_name = document.getElementById("player_name").value;
+    if(player_name.length > 10){
+        alert("Moc dlouhé uživatelské jméno! Limit je 10 znaků!");
+        document.getElementById("player_name").value = null;
+        return;
+    }
 
     if (!room_name || !player_name) {
         alert("Vyplňte jméno místnosti a jméno hráče!");
@@ -190,10 +215,11 @@ socket.on("update_players", (msg) => {
     ).innerText = `Hráči: ${msg.player_count} / ${msg.max_players}`;
 });
 
-//TODO: Naimplementuj funkci pro odpojení z lobby při zmáčnkutí tlačítka "zrušit"
-
 const start_room = () => {
-    socket.emit("start_room");
+    console.log(room_name);
+    socket.emit("start_room", {
+        room_name: room_name,
+    });
 };
 
 const set_indicator = (index, value, type) => {
