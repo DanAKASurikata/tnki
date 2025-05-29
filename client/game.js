@@ -52,6 +52,7 @@ class Game {
         this.draw_map();
 
         this.tanks.forEach((tank) => {
+            console.log(tank.dir)
             this.draw_tank(tank);
         });
 
@@ -90,6 +91,8 @@ class Game {
         scene.fillStyle = tank.color;
         scene.arc(tank.x * 50 + 25, tank.y * 50 + 25, 5, 0, 2 * Math.PI);
         scene.fill();
+        console.log(tank);
+        console.log(tank.dir);
     }
 
     draw_shot(shot) {
@@ -253,11 +256,16 @@ socket.on("room_started", (msg) => {
 
 //* Pohyb tanků
 socket.on("move_updated", (msg) => {
+    //console.log(msg.update.property);
+    console.log('\n \n');
     const tank = game.tanks.get(msg.id);
+    //console.log(tank + '\n');
 
     msg.update.forEach((update) => {
         tank[update.property] = update.value;
     });
+
+    console.log(tank.dir);
 
     game.update_scene();
 });

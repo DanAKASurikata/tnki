@@ -35,10 +35,10 @@ const start_positions = [
 
 //? Změnil jsi ovládání pohybu? Ujisti se, že jsou u klineta nastaveny stejné klávesy jako zde!
 const map_key_value = new Map([
-    ["KeyW", { x: 0, y: -1 }],
-    ["KeyA", { x: -1, y: 0 }],
-    ["KeyS", { x: 0, y: 1 }],
-    ["KeyD", { x: 1, y: 0 }],
+    ["KeyW", { x: 0, y: -1, r: 0 }],
+    ["KeyA", { x: -1, y: 0, r: 1 }],
+    ["KeyS", { x: 0, y: 1, r: 2  }],
+    ["KeyD", { x: 1, y: 0, r: 3 }],
 ]);
 
 const rooms = new Map();
@@ -107,6 +107,12 @@ class Tank {
 
     move(key, shift) {
         const action = map_key_value.get(key);
+
+        if(shift == true){
+            this.dir = action.r;
+            console.log(this.dir)
+            return [{ property: "r", value: this.dir }]
+        }
 
         //TODO: Pokud je stisknuta klávesa "shift", tak tank mění pouze směr
 
@@ -250,6 +256,8 @@ io.on("connection", (socket) => {
         const tank = room.tanks.get(socket.id);
 
         const update_msg = tank.move(msg.key, msg.shift);
+
+        console.log(update_msg);
 
         if (update_msg) {
             io.to(room.room_name).emit("move_updated", { id: socket.id, update: update_msg });
