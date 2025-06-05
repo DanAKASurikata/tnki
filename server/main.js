@@ -77,7 +77,7 @@ class Room {
 
 class Tank {
     constructor(index, player_name, session_id) {
-        this.dir = 0;
+        this.r = 0;
         this.health = 3;
         this.ammo = 3;
         this.x = start_positions[index].x;
@@ -109,9 +109,8 @@ class Tank {
         const action = map_key_value.get(key);
 
         if(shift == true){
-            this.dir = action.r;
-            console.log(this.dir)
-            return [{ property: "r", value: this.dir }]
+            this.r = action.r;
+            return [{ property: "r", value: this.r }]
         }
 
         //TODO: Pokud je stisknuta klávesa "shift", tak tank mění pouze směr

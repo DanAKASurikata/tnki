@@ -31,6 +31,8 @@ const shot_texture = new Image(50, 50);
 shot_texture.src = "assets/shot.png";
 //*
 
+const tank_rotace = [0, 270, 180, 90]
+
 let game;
 class Game {
     tank_directions = new Map([
@@ -45,6 +47,7 @@ class Game {
         this.tanks = tanks;
         this.map = map;
         this.shots_queue = [];
+        this.r = 0;
     }
 
     update_scene() {
@@ -52,7 +55,6 @@ class Game {
         this.draw_map();
 
         this.tanks.forEach((tank) => {
-            console.log(tank.dir)
             this.draw_tank(tank);
         });
 
@@ -79,6 +81,12 @@ class Game {
     //TODO: Vytvoř metodu pro rotaci tanku
 
     draw_tank(tank) {
+        console.log("///")
+        scene.translate(45/2, 45/2)
+        scene.rotate((tank_rotace[tank.r] * Math.PI) / 180)
+        scene.translate((45/2)*-1,(45/2)*-1)
+        console.log(scene)
+        console.log("///")
         scene.drawImage(
             tank_texture,
             tank.x * 50 + 2.5,
@@ -91,8 +99,6 @@ class Game {
         scene.fillStyle = tank.color;
         scene.arc(tank.x * 50 + 25, tank.y * 50 + 25, 5, 0, 2 * Math.PI);
         scene.fill();
-        console.log(tank);
-        console.log(tank.dir);
     }
 
     draw_shot(shot) {
@@ -257,15 +263,21 @@ socket.on("room_started", (msg) => {
 //* Pohyb tanků
 socket.on("move_updated", (msg) => {
     //console.log(msg.update.property);
+    //console.log(msg.update.property.get("r").value)
+    console.log(msg.update);
     console.log('\n \n');
+    console.log(game.tanks.get(msg.id))
     const tank = game.tanks.get(msg.id);
     //console.log(tank + '\n');
 
     msg.update.forEach((update) => {
         tank[update.property] = update.value;
+        console.log(update.value)
+        console.log(update.property)
     });
 
     console.log(tank.dir);
+    console.log("");
 
     game.update_scene();
 });
