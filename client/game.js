@@ -82,7 +82,7 @@ class Game {
 
     draw_tank(tank) {
         console.log("///")
-        scene.translate(45/2, 45/2)
+        scene.translate((45/2), (45/2))
         scene.rotate((tank_rotace[tank.r] * Math.PI) / 180)
         scene.translate((45/2)*-1,(45/2)*-1)
         console.log(scene)
@@ -99,6 +99,11 @@ class Game {
         scene.fillStyle = tank.color;
         scene.arc(tank.x * 50 + 25, tank.y * 50 + 25, 5, 0, 2 * Math.PI);
         scene.fill();
+        
+        scene.translate((tank.x *50)+(45/2), (tank.y * 50)+(45/2))
+        scene.rotate((tank_rotace[tank.r] * Math.PI) / (180*-1))
+        scene.translate((tank.x * 50)+(45/2)*-1,(tank.y * 50)+(45/2)*-1)
+        console.log(tank.x * 50);
     }
 
     draw_shot(shot) {
